@@ -235,6 +235,7 @@ def get_evolucion_hotel(hotel_id: int, anio: int = Query(default=2024)):
 
 
 # RFC3 - Perfil comparativo de hoteles por ciudad
+@app.get('/rfc/comparativo')
 def get_comparativo(hoteles: str = Query(default="2,6")):
     ids_hoteles = [int(x) for x in hoteles.split(",")]
     
@@ -290,5 +291,4 @@ def get_comparativo(hoteles: str = Query(default="2,6")):
         },
         {"$sort": {"promedio_calificacion": -1}}
     ]))
-    
     return consulta
