@@ -69,6 +69,20 @@ def post_resena(hotel_id: int, datos: dict):
 # RF2 - Editar reseña
 @app.put('/resenas/{resena_id}')
 def put_resena(resena_id: str, datos: dict):
+
+    resena = db["Resena"].find_one(
+        {"_id": ObjectId(resena_id)}
+    )
+
+    if not resena:
+        return {"mensaje": "Reseña no encontrada"}
+
+    if resena["id_cliente"] != datos["id_cliente"]:
+        return {
+            "mensaje":
+            "El cliente no puede editar esta reseña"
+        }
+
     cambios = {}
 
     if "texto" in datos:
