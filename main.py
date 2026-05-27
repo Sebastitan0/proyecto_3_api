@@ -4,6 +4,8 @@ from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
 import os
+from datetime import datetime
+from fastapi import Query
 
 app = FastAPI()
 
@@ -162,14 +164,17 @@ def put_destacar(resena_id: str):
 
 # RFC1 - Top 10 hoteles con mejor calificación promedio
 @app.get('/rfc/top-hoteles')
-def get_top_hoteles():
+def get_top_hoteles(fecha_inicio: str = Query(default="2024-01-01"),fecha_fin: str = Query(default="2024-12-31")):
+    dt_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+    dt_fin = datetime.strptime(fecha_fin, "%Y-%m-%d")
+
     consulta = list(db["Resena"].aggregate([
         {
             "$match": {
                 "estado": "publicada",
                 "fecha_creacion": {
-                    "$gte": datetime(2024, 1, 1),
-                    "$lte": datetime(2024, 12, 31)
+                    "$gte": dt_inicio,
+                    "$lte": dt_fin
                 }
             }
         },
@@ -191,7 +196,7 @@ def get_top_hoteles():
             }
         }
     ]))
-
+    
     return consulta
 
 
