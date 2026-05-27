@@ -40,20 +40,27 @@ def get_resenas_hotel(hotel_id: int):
 # RF1 - Crear reseña
 @app.post('/hoteles/{hotel_id}/resenas')
 def post_resena(hotel_id: int, datos: dict):
-    datos["id_hotel"] = hotel_id
-    datos["fecha_creacion"] = datetime.now()
-    datos["estado"] = "publicada"
-    datos["destacada"] = False
-    datos["total_votos"] = 0
-    datos["votos_clientes"] = []
-    datos["respuesta_admin"] = None
+    nueva_resena = {
+        "id_hotel": hotel_id,
+        "id_cliente": datos["id_cliente"],
+        "codigo_confirmacion": datos["codigo_confirmacion"],
+        "calificacion": datos["calificacion"],
+        "texto": datos["texto"],
+        "fecha_creacion": datetime.now(),
+        "estado": "publicada",
+        "destacada": False,
+        "total_votos": 0,
+        "votos_clientes": [],
+        "respuesta_admin": None}
     
-    existente = db["Resena"].find_one({"codigo_confirmacion": datos["codigo_confirmacion"]})
+    existente = db["Resena"].find_one(
+    {"codigo_confirmacion": nueva_resena["codigo_confirmacion"]}
+)
 
     if existente:
         return {"mensaje": "Esta reserva ya tiene una reseña registrada"}
 
-    db["Resena"].insert_one(datos)
+    db["Resena"].insert_one(nueva_resena)
     return {"mensaje": "Reseña guardada"}
 
 
