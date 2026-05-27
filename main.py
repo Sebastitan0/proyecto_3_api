@@ -99,7 +99,7 @@ def put_resena(resena_id: str, datos: dict):
     return {"mensaje": "Reseña actualizada"}
 
 
-# RF3 y RF8 - Eliminar reseña
+#RF8 - Eliminar reseña
 @app.delete('/resenas/{resena_id}')
 def delete_resena(resena_id: str):
     db["Resena"].update_one(
@@ -108,7 +108,25 @@ def delete_resena(resena_id: str):
     )
 
     return {"mensaje": "Reseña eliminada"}
+#RF3 - Eliminar reseña
+@app.delete('/resenas/{resena_id}/cliente/{cliente_id}')
+def delete_resena_cliente(resena_id: str, cliente_id: int):
+    resena = db["Resena"].find_one(
+        {"_id": ObjectId(resena_id)}
+    )
 
+    if not resena:
+        return {"mensaje": "Reseña no encontrada"}
+
+    if resena["id_cliente"] != cliente_id:
+        return {"mensaje": "El cliente no puede eliminar esta reseña"}
+
+    db["Resena"].update_one(
+        {"_id": ObjectId(resena_id)},
+        {"$set": {"estado": "eliminada"}}
+    )
+
+    return {"mensaje": "Reseña eliminada"}
 
 # RF5 - Marcar reseña como útil
 @app.post('/resenas/{resena_id}/voto')
