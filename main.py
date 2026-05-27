@@ -235,14 +235,14 @@ def get_evolucion_hotel(hotel_id: int, anio: int = Query(default=2024)):
 
 
 # RFC3 - Perfil comparativo de hoteles por ciudad
-# Para Bogota usamos como ejemplo los hoteles 2 y 6
-@app.get('/rfc/comparativo-bogota')
-def get_comparativo_bogota():
+def get_comparativo(hoteles: str = Query(default="2,6")):
+    ids_hoteles = [int(x) for x in hoteles.split(",")]
+    
     consulta = list(db["Resena"].aggregate([
         {
             "$match": {
                 "estado": "publicada",
-                "id_hotel": {"$in": [2, 6]}
+                "id_hotel": {"$in": ids_hoteles}
             }
         },
         {
@@ -277,26 +277,10 @@ def get_comparativo_bogota():
                 "promedio_calificacion": {"$round": ["$hoteles.promedio_calificacion", 2]},
                 "total_resenas": "$hoteles.total_resenas",
                 "porcentaje_con_respuesta": {
-                    "$round": [
-                        {
-                            "$multiply": [
-                                {"$divide": ["$hoteles.resenas_con_respuesta", "$hoteles.total_resenas"]},
-                                100
-                            ]
-                        },
-                        1
-                    ]
+                    "$round": [{"$multiply": [{"$divide": ["$hoteles.resenas_con_respuesta", "$hoteles.total_resenas"]}, 100]}, 1]
                 },
                 "porcentaje_destacadas": {
-                    "$round": [
-                        {
-                            "$multiply": [
-                                {"$divide": ["$hoteles.resenas_destacadas", "$hoteles.total_resenas"]},
-                                100
-                            ]
-                        },
-                        1
-                    ]
+                    "$round": [{"$multiply": [{"$divide": ["$hoteles.resenas_destacadas", "$hoteles.total_resenas"]}, 100]}, 1]
                 },
                 "promedio_ciudad": {"$round": ["$promedio_ciudad", 2]},
                 "debajo_promedio_ciudad": {
@@ -306,5 +290,5 @@ def get_comparativo_bogota():
         },
         {"$sort": {"promedio_calificacion": -1}}
     ]))
-
+    
     return consulta
