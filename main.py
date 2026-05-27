@@ -202,15 +202,15 @@ def get_top_hoteles(fecha_inicio: str = Query(default="2024-01-01"),fecha_fin: s
 
 # RFC2 - Evolución de reputación mes a mes de un hotel
 @app.get('/rfc/evolucion/{hotel_id}')
-def get_evolucion_hotel(hotel_id: int):
+def get_evolucion_hotel(hotel_id: int, anio: int = Query(default=2024)):
     consulta = list(db["Resena"].aggregate([
         {
             "$match": {
                 "id_hotel": hotel_id,
                 "estado": "publicada",
                 "fecha_creacion": {
-                    "$gte": datetime(2024, 1, 1),
-                    "$lte": datetime(2024, 12, 31)
+                    "$gte": datetime(anio, 1, 1),
+                    "$lte": datetime(anio, 12, 31)
                 }
             }
         },
@@ -231,7 +231,6 @@ def get_evolucion_hotel(hotel_id: int):
             }
         }
     ]))
-
     return consulta
 
 
